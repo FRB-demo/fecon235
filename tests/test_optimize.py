@@ -53,8 +53,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
                Stack Overflow: http://stackoverflow.com/a/8672743
 '''
 
-from __future__ import absolute_import, print_function
-
 import numpy as np
 from fecon235.lib import yi_0sys as system
 from fecon235.lib import ys_optimize as yop
