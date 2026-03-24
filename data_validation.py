@@ -22,7 +22,6 @@ from __future__ import absolute_import, print_function
 import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 @dataclass
