@@ -21,8 +21,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
                https://github.com/rsvp/fecon235/issues/5
 '''
 
-from __future__ import absolute_import, print_function
-
 from fecon235.lib import yi_0sys as system
 from fecon235.lib import yi_fred as fred
 from fecon235.lib import yi_1tools as tools

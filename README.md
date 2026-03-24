@@ -50,6 +50,18 @@ Data is designed to be accessible *free* of charge,
 and *interoperable* in different time frequencies.
 
 
+### Quick Setup
+
+**Requirements:** Python 3.9+
+
+```bash
+# Install dependencies:
+pip install -r requirements.txt
+
+# Run the notebooks:
+jupyter notebook nb/
+```
+
 ### How does one get started?
 
 * Good introductory lectures for economists to Python and its ecosystem:

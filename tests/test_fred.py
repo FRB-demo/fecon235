@@ -18,8 +18,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2016-11-06  First version to verify fix #6.
 '''
 
-from __future__ import absolute_import, print_function
-
 import numpy as np
 import pandas as pd
 from fecon235.lib import yi_0sys as system

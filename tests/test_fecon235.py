@@ -37,8 +37,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-09-02  First version for get().
 '''
 
-from __future__ import absolute_import, print_function
-
 from fecon235.fecon235 import *
 #    ^in one line we get essential functions from the yi_* modules,
 #     including yi_0sys as system.

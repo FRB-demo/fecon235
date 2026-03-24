@@ -43,8 +43,11 @@ TODO
          Bloomberg Global ID is a random 12-character alpha-numeric.
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import annotations
 
+from typing import Any, Union
+
+import numpy as np
 import pandas as pd
 from .lib import yi_0sys as system
 
@@ -87,7 +90,7 @@ world4d = { 'America' : 's4spy', 'Europe' : 's4ezu',
 #         representing EQUITIES worldwide plus gold.
 
 
-def get( code, maxi=0 ):
+def get( code: str, maxi: int = 0 ) -> pd.DataFrame:
     '''Unifies getfred, getqdl, and getstock for data retrieval.
     code is fredcode, quandlcode, futures slang, or stock slang.
     maxi should be an integer to set maximum number of data points, 
@@ -110,24 +113,24 @@ def get( code, maxi=0 ):
     '''
     try:
         df = getfred( code )
-    except:
+    except (ValueError, KeyError, Exception):
         try:
             if maxi:
                 df = getqdl( code, maxi )
             else:
                 df = getqdl( code )
-        except:
+        except (ValueError, KeyError, Exception):
             try:
                 if maxi:
                     df = getstock( code, maxi )
                 else:
                     df = getstock( code )
-            except: 
+            except (ValueError, KeyError, Exception):
                 raise ValueError('INVALID symbol string or code for fecon get()')
     return df
 
 
-def plot( data, title='tmp', maxi=87654321 ):
+def plot( data: Union[pd.DataFrame, str], title: str = 'tmp', maxi: int = 87654321 ) -> None:
     '''Unifies plotdf, plotfred and plotqdl for plotting data.
        The "data" argument could also be fredcode or quandlcode, 
        but not stock slang -- a Dataframe is first choice, 
@@ -137,19 +140,19 @@ def plot( data, title='tmp', maxi=87654321 ):
     try:
         plotdf( tail(data, maxi), title )
         #  2016-01-20  plotdf now sports a todf pre-filter for convenience.
-    except:
+    except (TypeError, ValueError, AttributeError):
         try:
             plotfred( data, title, maxi )
-        except:
+        except (ValueError, KeyError, Exception):
             try:
                 plotqdl( data, title, maxi )
-            except:
+            except (ValueError, KeyError, Exception):
                 raise ValueError('INVALID argument or data for fecon plot()')
     return
 
 
 
-def forecast( data, h=12, grids=0, maxi=0 ):
+def forecast( data: Union[pd.DataFrame, str], h: int = 12, grids: int = 0, maxi: int = 0 ) -> pd.DataFrame:
     '''Make h period ahead forecasts using holt* or optimize_holtforecast,
        where "data" may be a DataFrame, fredcode, quandlcode, or stock slang.
        (Supercedes: "Unifies holtfred and holtqdl for quick forecasting.")
@@ -160,7 +163,7 @@ def forecast( data, h=12, grids=0, maxi=0 ):
             data = get( data, maxi )
             #           ^expecting fredcode, quandlcode, or stock slang
             #      to be retrieved as DataFrame.
-        except:
+        except (ValueError, KeyError):
             raise ValueError("fecon235.forecast(): INVALID data argument.")
     if grids > 0:
         #  Recommend grids=50 for reasonable results,
@@ -178,14 +181,14 @@ def forecast( data, h=12, grids=0, maxi=0 ):
         return holtforecast( holtdf, h )
 
 
-def foreholt( data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0 ):
+def foreholt( data: Union[pd.DataFrame, str], h: int = 12, alpha: float = hw_alpha, beta: float = hw_beta, maxi: int = 0 ) -> pd.DataFrame:
     '''Holt-Winters forecast h-periods ahead (data slang aware).'''
     #  "data" can be a fredcode, quandlcode, stock slang, 
     #         OR a DataFrame which will be detected:
     if not isinstance( data, pd.DataFrame ):
         try:
             data = get( data, maxi )
-        except:
+        except (ValueError, KeyError):
             raise ValueError("fecon235.forehalt(): INVALID data argument.")
     #  To find optimal parameter values for alpha and beta beforehand, 
     #  use optimize_holtforecast() in module ys_opt_holt.
@@ -194,13 +197,13 @@ def foreholt( data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0 ):
     return holtforecast( holtdf, h )
 
 
-def holtfred( data, h=24, alpha=hw_alpha, beta=hw_beta ):
+def holtfred( data: Union[pd.DataFrame, str], h: int = 24, alpha: float = hw_alpha, beta: float = hw_beta ) -> pd.DataFrame:
      '''Holt-Winters forecast h-periods ahead (fredcode aware).'''
      #  Retained for backward compatibility, esp. pre-2016 notebooks.
      return foreholt( data, h, alpha, beta )
 
 
-def groupget( ggdic=group4d, maxi=0 ):
+def groupget( ggdic: dict[str, str] = group4d, maxi: int = 0 ) -> pd.DataFrame:
     '''Retrieve and create group dataframe, given group dictionary.'''
     #  Since dictionaries are unordered, create SORTED list of keys:
     keys = [ key for key in sorted(ggdic) ]
@@ -214,7 +217,7 @@ def groupget( ggdic=group4d, maxi=0 ):
     return groupdf
 
 
-def groupfun( fun, groupdf, *pargs, **kwargs ):
+def groupfun( fun: Any, groupdf: pd.DataFrame, *pargs: Any, **kwargs: Any ) -> pd.DataFrame:
     '''Use fun(ction) column-wise, then output new group dataframe.'''
     #  In math, this is known as an "operator":
     #           a function which takes another function as argument.
@@ -231,20 +234,20 @@ def groupfun( fun, groupdf, *pargs, **kwargs ):
     return outdf
 
 
-def grouppc( groupdf, freq=1 ):
+def grouppc( groupdf: pd.DataFrame, freq: int = 1 ) -> pd.DataFrame:
     '''Create overlapping pcent dataframe, given a group dataframe.'''
     #  See groupget() to retrieve and create group dataframe.  
     #  Very useful to visualize as boxplot, see fred-georeturns.ipynb
     return groupfun( pcent, groupdf, freq )
 
 
-def groupdiflog( groupdf, lags=1 ):
+def groupdiflog( groupdf: pd.DataFrame, lags: int = 1 ) -> pd.DataFrame:
     '''Difference between lagged log(data) for columns in group dataframe.'''
     #  See groupget() to retrieve and create group dataframe.  
     return groupfun( diflog, groupdf, lags )
 
 
-def covdiflog( groupdf, lags=1 ):
+def covdiflog( groupdf: pd.DataFrame, lags: int = 1 ) -> np.ndarray:
     '''Covariance array for differenced log(column) from group dataframe.
        For correlation array: apply yi_matrix.cov2cor() later.
     '''
@@ -256,7 +259,7 @@ def covdiflog( groupdf, lags=1 ):
     return V.values
 
 
-def groupgeoret( groupdf, yearly=256, order=True ):
+def groupgeoret( groupdf: pd.DataFrame, yearly: int = 256, order: bool = True ) -> list:
     '''Geometric mean returns, non-overlapping, for group dataframe.
        Argument "yearly" refers to annual frequency, e.g. 
        256 for daily trading days, 12 for monthly, 4 for quarterly.
@@ -272,7 +275,7 @@ def groupgeoret( groupdf, yearly=256, order=True ):
     return geo
 
 
-def groupgemrat( groupdf, yearly=256, order=False, n=2 ):
+def groupgemrat( groupdf: pd.DataFrame, yearly: int = 256, order: bool = False, n: int = 2 ) -> list:
     '''Geometric mean rates, non-overlapping, for group dataframe.
        Argument "yearly" refers to annual frequency, e.g. 
        256 for daily trading days, 12 for monthly, 4 for quarterly.
@@ -290,7 +293,7 @@ def groupgemrat( groupdf, yearly=256, order=False, n=2 ):
     return gem
 
 
-def groupholtf( groupdf, h=12, alpha=ts.hw_alpha, beta=ts.hw_beta ):
+def groupholtf( groupdf: pd.DataFrame, h: int = 12, alpha: float = ts.hw_alpha, beta: float = ts.hw_beta ) -> pd.DataFrame:
     '''Holt-Winters forecasts h-periods ahead from group dataframe.'''
     #  Tip: use all available (non-sliced) data for forecasting.    
     #  This is essentially a Kalman filter with optimal alpha-beta, 
@@ -308,7 +311,7 @@ def groupholtf( groupdf, h=12, alpha=ts.hw_alpha, beta=ts.hw_beta ):
     return keysdf
 
 
-def groupcotr( group=cotr4w, alpha=0 ): 
+def groupcotr( group: dict[str, str] = cotr4w, alpha: float = 0 ) -> pd.DataFrame: 
     '''Compute latest normalized CFTC COTR position indicators.
        Optionally specify alpha for Exponential Moving Average
        which is a smoothing parameter: 0 < alpha < 1 (try 0.26)
@@ -324,7 +327,7 @@ def groupcotr( group=cotr4w, alpha=0 ):
         return norpositions
 
 
-def forefunds( nearby='16m', distant='17m' ):
+def forefunds( nearby: str = '16m', distant: str = '17m' ) -> pd.DataFrame:
     '''Forecast distant Fed Funds rate using Eurodollar futures.'''
     #  Long derivation is given in qdl-libor-fed-funds.ipynb
     ffer = getfred('DFF')
@@ -339,7 +342,7 @@ def forefunds( nearby='16m', distant='17m' ):
     return todf( ffer_ema + libor_spread )
 
 
-def foreinfl( n=120, alpha=1.0, beta=0.3673 ):
+def foreinfl( n: int = 120, alpha: float = 1.0, beta: float = 0.3673 ) -> list:
     '''Forecast Unified Inflation 1-year ahead per fred-inflation.ipynb.'''
     #  Holt-Winters parameters alpha and beta are optimized
     #  from the 1960-2018 dataset, consisting of 697 monthly points.
