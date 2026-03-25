@@ -155,7 +155,7 @@ d4spx     = 'SP500'              # S&P 500 index a.k.a. SPX, daily
      #             ~/ok/biz/inv/eq/data/FRED-SP500_1957-2014-ARC.csv.gz
      #        See getspx below which will read a local copy.
      #
-     #  [ ] - method expires 2024, then use to_csv method to renew archive.
+     #  [ ] - EXPIRED: method was set to expire 2024. Needs to_csv renewal. See issue tracker.
 
 d4brent  = 'DCOILBRENTEU'        # Oil Brent, DoE NSA daily
 d4wti    = 'DCOILWTICO'          # Oil WTI,   DoE NSA daily
@@ -278,16 +278,11 @@ def readfile( filename, separator=',', compress=None ):
     #        when data is missing or mistyped, e.g.
     #             dataframe['Y'] = dataframe['Y'].astype(float)
     #        will fail if the data is not in perfect condition.
-    try:
-        dataframe['Y'] = pd.to_numeric(dataframe['Y'], errors='coerce')
-        #  'coerce' gives NaN if particular parsing is invalid.
-    except:
-        #  convert_objects deprecated, but courtesy for pd < 0.17:
-        dataframe['Y'] = dataframe['Y'].convert_objects(convert_numeric=True)
-        #                              ^non-convertibles become NaN
+    dataframe['Y'] = pd.to_numeric(dataframe['Y'], errors='coerce')
+    #  'coerce' gives NaN if particular parsing is invalid.
 
     #  FRED uses "." to indicate missing value.
-    dataframe['Y'] = dataframe['Y'].fillna(method='pad')
+    dataframe['Y'] = dataframe['Y'].ffill()
     #                              ^NaN replaced by fill forward, 
     #                               common practice in time series analysis.
     return dataframe
@@ -297,9 +292,9 @@ def readfile( filename, separator=',', compress=None ):
 
 
 def makeURL( fredcode ):
-    '''Create http address to access FRED's CSV files.'''
+    '''Create https address to access FRED's CSV files.'''
     #         Validated July 2014.
-    return 'http://research.stlouisfed.org/fred2/series/' \
+    return 'https://research.stlouisfed.org/fred2/series/' \
         + fredcode + '/downloaddata/' + fredcode + '.csv'
 
 
