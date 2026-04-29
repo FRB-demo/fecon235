@@ -297,9 +297,6 @@ def _pushcodetest(code):
 
 def _getauthtoken(token, text):
     """Return API token, checking env var QUANDL_API_KEY then JSON cache."""
-    env_token = os.environ.get('QUANDL_API_KEY', '')
-    if env_token:
-        return env_token
     cache_file = os.path.join(os.path.expanduser('~'), '.quandl_token.json')
     savedtoken = False
     try:
@@ -324,6 +321,9 @@ def _getauthtoken(token, text):
         token = savedtoken
         if text and text != "no":
             print("Using cached token for authentication.")
+    env_token = os.environ.get('QUANDL_API_KEY', '')
+    if env_token:
+        return env_token
     return token
 
 
