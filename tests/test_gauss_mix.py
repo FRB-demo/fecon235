@@ -101,7 +101,7 @@ def test_ys_gauss_mix_fecon235_check_gm2_strategy_infeasible():
         #  INTENTIONAL FAIL: That b is too low for high kurtosis.
         #  Previous test shows feasible when kurtosis=7.
         #  sympy actually fails correctly, and will raise its exception.
-    except (ValueError, RuntimeError, Exception):
+    except (ValueError, RuntimeError, SystemExit, Exception):
         a_feasible = "Intentionally_FATAL_since_INFEASIBLE"
         #             Avoids reproducing the traceback to assert next:
     assert a_feasible == "Intentionally_FATAL_since_INFEASIBLE"
