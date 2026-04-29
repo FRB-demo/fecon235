@@ -52,8 +52,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2014-08-08  First version covers Holt-Winters linear model.
 '''
 
-from __future__ import absolute_import, print_function
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np

@@ -17,7 +17,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-08-30  First revised version for form 13F.
 '''
 
-from __future__ import absolute_import, print_function
 
 import numpy as np                #  for numerical work.
 import pandas as pd               #  for data munging.
@@ -33,8 +32,7 @@ druck150814='http://www.sec.gov/Archives/edgar/data/1536411/000153641115000006/x
 def parse13f( url=druck150814 ):
      '''Parse SEC form 13F into a pandas dataframe.'''
      #     url should be for so-called Information Table in html/xml format.
-     url = url.replace('https://', 'http://')
-     #                  https cannot be read by lxml, surprisingly!
+     #  Use https for secure data fetching from SEC:
      #
      #  Use pandas to read in the xml page...
      #  See http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_html.html

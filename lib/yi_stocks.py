@@ -42,15 +42,8 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-09-13  First version based on yi_quandl module.
 '''
 
-from __future__ import absolute_import, print_function
-
 import datetime        #  pddata necessity.
-try:
-    import pandas_datareader.data as pddata  
-    #  for pandas 0.17 and above
-except:
-    import pandas.io.data as pddata
-    #  For old deprecated pandas
+import pandas_datareader.data as pddata
 
 #  In pandas 0.17.0, the sub-package pandas.io.data will be removed 
 #  in favor of a separately installable pandas-datareader package. 
@@ -87,7 +80,7 @@ def stock_decode( slang ):
     else:
         try:
             symbol = slang[2:].upper()
-        except:
+        except (IndexError, AttributeError):
             raise ValueError('Stock slang argument is invalid.')
     return symbol
 
@@ -114,7 +107,7 @@ def stock_all( slang, maxi=3650 ):
      try:
           df = pddata.DataReader( symbol, 'yahoo',  start, end )
           print(" ::  Retrieved from Yahoo Finance: " + symbol )
-     except:
+     except (IOError, KeyError, ValueError):
           df = pddata.DataReader( symbol, 'google', start, end )
           print(" ::  Retrieved from Google Finance: " + symbol)
      return df

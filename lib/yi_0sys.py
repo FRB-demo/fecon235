@@ -34,29 +34,22 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-12-03  First version.
 '''
 
-from __future__ import absolute_import, print_function
-#    __future__ for Python 2 and 3 compatibility; must be first in file.
+import importlib
 import sys
 import os
+import subprocess
 import time
 from subprocess import check_output, STDOUT
-#                      ^for Python 2.7 and 3+
 
 
-minimumPython = ( 2, 7, 0 )
+minimumPython = ( 3, 7, 0 )
 #             ... else a warning is generated in specs().
 minimumPandas = 18.0
 #               ^after replacing the first dot, then float.
 
 
-#             Open  /dev/null equivalent file for Unix and Windows:
-dev_null = os.open(os.devnull, os.O_RDWR)
-#                                 ^Cross-platform read and write. 
-#             os.devnull is just a string:  "/dev/null" or "nul"
-#             thus redirecting to os.devnull is insufficient
-#             and that alone will cause a fileno error.
-#  We could later close it by: os.close(dev_null). Leave open.
-#  See gitinfo() for example of usage.
+#  Use subprocess.DEVNULL for cross-platform /dev/null equivalent:
+dev_null = subprocess.DEVNULL
 
 
 def getpwd():
@@ -129,10 +122,9 @@ def versionstr( module="IPython" ):
         return str(ver[0]) + '.' + str(ver[1]) + '.' + str(ver[2])   
     else: 
         try:
-            exec( "import " + module )
-            exec( "vermod = " + module + ".__version__" )
-            return vermod
-        except:
+            mod = importlib.import_module(module)
+            return getattr(mod, '__version__', None)
+        except Exception:
             return None
 
 
@@ -142,9 +134,8 @@ def versiontup( module="IPython" ):
     try:
         v = [ int(k) for k in s.split('.') ]
         return tuple(v)
-    except:
-        #  e.g. if not installed or not convertible to integers...
-        if s == None:
+    except (AttributeError, ValueError):
+        if s is None:
             return ( 0,  0,  0)
         else:
             return (-9, -9, -9)
@@ -197,7 +188,7 @@ def gitinfo():
         bra = run("git symbolic-ref --short HEAD", errf=dev_null)
         #         ^returns the current working branch name.
         return [repo, tag, bra]
-    except CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         #  Probably outside git boundaries...
         return ['git_repo_None', 'tag_None', 'branch_None']
 
@@ -225,15 +216,7 @@ def specs():
     print(" ::  Timestamp:", timestamp() )
 
 
-if pythontup() < (3, 0, 0):
-    '''ROSETTA STONE FUNCTIONS approximately bridging Python 2 and 3.
-    e.g.       answer = get_input("Favorite animal? ")
-               print(answer)
-    '''
-    get_input = raw_input
-else:
-    get_input = input
-    #           ^beware of untrustworthy arguments!
+get_input = input
 
 
 def endmodule():

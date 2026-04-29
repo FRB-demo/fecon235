@@ -18,7 +18,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2017-06-17  First version.
 '''
 
-from __future__ import absolute_import, print_function, division
 import numpy as np
 
 from fecon235.lib import yi_matrix as matrix

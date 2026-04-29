@@ -23,8 +23,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2016-12-19  First version.
 '''
 
-from __future__ import absolute_import, print_function
-
 import numpy as np
 from fecon235.lib import yi_0sys as system
 from fecon235.lib import yi_1tools as tools

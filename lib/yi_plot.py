@@ -25,8 +25,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2014-08-05  Revise from yip_plot.py for boxplot to handle dataframe.
 '''
 
-from __future__ import absolute_import, print_function
-
 import matplotlib.pyplot as plt
 import matplotlib.cm as colormap
 import pandas as pd

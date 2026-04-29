@@ -43,8 +43,6 @@ TODO
          Bloomberg Global ID is a random 12-character alpha-numeric.
 '''
 
-from __future__ import absolute_import, print_function
-
 import pandas as pd
 from .lib import yi_0sys as system
 
@@ -110,19 +108,19 @@ def get( code, maxi=0 ):
     '''
     try:
         df = getfred( code )
-    except:
+    except (ValueError, KeyError, Exception):
         try:
             if maxi:
                 df = getqdl( code, maxi )
             else:
                 df = getqdl( code )
-        except:
+        except (ValueError, KeyError, Exception):
             try:
                 if maxi:
                     df = getstock( code, maxi )
                 else:
                     df = getstock( code )
-            except: 
+            except (ValueError, KeyError, Exception):
                 raise ValueError('INVALID symbol string or code for fecon get()')
     return df
 
@@ -137,13 +135,13 @@ def plot( data, title='tmp', maxi=87654321 ):
     try:
         plotdf( tail(data, maxi), title )
         #  2016-01-20  plotdf now sports a todf pre-filter for convenience.
-    except:
+    except (TypeError, ValueError, AttributeError):
         try:
             plotfred( data, title, maxi )
-        except:
+        except (ValueError, KeyError, Exception):
             try:
                 plotqdl( data, title, maxi )
-            except:
+            except (ValueError, KeyError, Exception):
                 raise ValueError('INVALID argument or data for fecon plot()')
     return
 
@@ -160,7 +158,7 @@ def forecast( data, h=12, grids=0, maxi=0 ):
             data = get( data, maxi )
             #           ^expecting fredcode, quandlcode, or stock slang
             #      to be retrieved as DataFrame.
-        except:
+        except (ValueError, KeyError):
             raise ValueError("fecon235.forecast(): INVALID data argument.")
     if grids > 0:
         #  Recommend grids=50 for reasonable results,
@@ -185,7 +183,7 @@ def foreholt( data, h=12, alpha=hw_alpha, beta=hw_beta, maxi=0 ):
     if not isinstance( data, pd.DataFrame ):
         try:
             data = get( data, maxi )
-        except:
+        except (ValueError, KeyError):
             raise ValueError("fecon235.forehalt(): INVALID data argument.")
     #  To find optimal parameter values for alpha and beta beforehand, 
     #  use optimize_holtforecast() in module ys_opt_holt.

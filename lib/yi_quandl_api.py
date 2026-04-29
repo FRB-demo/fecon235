@@ -3,25 +3,16 @@
 Quandl's API for Python.
 Currently supports getting, searching, and pushing datasets.
 """
-from __future__ import (print_function, division, absolute_import,
-                        unicode_literals)
-import pickle
 import datetime
 import json
+import os
 import pandas as pd
 import re
 from dateutil import parser
 from numpy import genfromtxt
-
-try:
-    from urllib.error import HTTPError  # Python 3
-    from urllib.parse import urlencode
-    from urllib.request import Request, urlopen
-    strings = str
-except ImportError:
-    from urllib import urlencode  # Python 2
-    from urllib2 import HTTPError, Request, urlopen
-    strings = unicode
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 
 
@@ -60,7 +51,7 @@ def get(dataset, **kwargs):
 
 
     #Unicode String
-    if type(dataset) == strings or type(dataset) == str:
+    if isinstance(dataset, str):
 
         if '.' in dataset:
             dataset_temp = dataset.split('.')
@@ -95,7 +86,7 @@ def get(dataset, **kwargs):
     verbose = kwargs.get('verbose', False)
     if 'text' in kwargs:
         print('Deprecated: "text" is deprecated and will be removed in next release, use "verbose" instead.')
-        if isinstance(kwargs['text'], (strings, str)):
+        if isinstance(kwargs['text'], str):
             if kwargs['text'].lower() in ['yes', 'y', 't', 'true', 'on']:
                 verbose = True
         else:
@@ -290,7 +281,7 @@ def _download(url):
 #Push data to Quandl. Returns json of HTTP push.
 def _htmlpush(url, raw_params):
     page = url
-    params = urlencode(raw_params)
+    params = urlencode(raw_params).encode('utf-8')
     request = Request(page, params)
     page = urlopen(request)
     return json.loads(page.read())
@@ -304,35 +295,35 @@ def _pushcodetest(code):
         raise CodeFormatError(error)
     return code
 
-def _getauthtoken(token,text):
-    """Return and save API token to a pickle file for reuse."""
+def _getauthtoken(token, text):
+    """Return API token with priority: explicit token > env var > JSON cache."""
+    cache_file = os.path.join(os.path.expanduser('~'), '.quandl_token.json')
+    savedtoken = False
     try:
-        savedtoken = pickle.load(open('authtoken.p', 'rb'))
-    except IOError:
+        with open(cache_file, 'r') as f:
+            savedtoken = json.load(f).get('token', '')
+    except (IOError, OSError, json.JSONDecodeError):
         savedtoken = False
     if token:
         try:
-            pickle.dump(token, open('authtoken.p', 'wb'))
-            if text == "no" or text == False:
-                pass
-
-            else:
-                print("Token {} activated and saved for later use.".format(token))
-        except Exception as e:
+            with open(cache_file, 'w') as f:
+                json.dump({'token': token}, f)
+            os.chmod(cache_file, 0o600)
+            if text and text != "no":
+                print("Token activated and saved for later use.")
+        except (IOError, OSError) as e:
             print("Error writing token to cache: {}".format(str(e)))
-
-    elif not savedtoken and not token:
-            if text == "no" or text == False:
-                pass
-            else:
-                print("No authentication tokens found: usage will be limited.")
-                print("See www.quandl.com/api for more information.")
-    elif savedtoken and not token:
-        token = savedtoken
-        if text == "no" or text == False:
-             pass
-        else:
-            print("Using cached token {} for authentication.".format(token))
+        return token
+    env_token = os.environ.get('QUANDL_API_KEY', '')
+    if env_token:
+        return env_token
+    if savedtoken:
+        if text and text != "no":
+            print("Using cached token for authentication.")
+        return savedtoken
+    if text and text != "no":
+        print("No authentication tokens found: usage will be limited.")
+        print("Set QUANDL_API_KEY env var or see www.quandl.com/api.")
     return token
 
 
