@@ -281,7 +281,7 @@ def _download(url):
 #Push data to Quandl. Returns json of HTTP push.
 def _htmlpush(url, raw_params):
     page = url
-    params = urlencode(raw_params)
+    params = urlencode(raw_params).encode('utf-8')
     request = Request(page, params)
     page = urlopen(request)
     return json.loads(page.read())
@@ -296,7 +296,7 @@ def _pushcodetest(code):
     return code
 
 def _getauthtoken(token, text):
-    """Return API token, checking env var QUANDL_API_KEY then JSON cache."""
+    """Return API token with priority: explicit token > env var > JSON cache."""
     cache_file = os.path.join(os.path.expanduser('~'), '.quandl_token.json')
     savedtoken = False
     try:
@@ -313,17 +313,17 @@ def _getauthtoken(token, text):
                 print("Token activated and saved for later use.")
         except (IOError, OSError) as e:
             print("Error writing token to cache: {}".format(str(e)))
+        return token
     env_token = os.environ.get('QUANDL_API_KEY', '')
     if env_token:
         return env_token
-    if not savedtoken and not token:
-        if text and text != "no":
-            print("No authentication tokens found: usage will be limited.")
-            print("Set QUANDL_API_KEY env var or see www.quandl.com/api.")
-    elif savedtoken and not token:
-        token = savedtoken
+    if savedtoken:
         if text and text != "no":
             print("Using cached token for authentication.")
+        return savedtoken
+    if text and text != "no":
+        print("No authentication tokens found: usage will be limited.")
+        print("Set QUANDL_API_KEY env var or see www.quandl.com/api.")
     return token
 
 
