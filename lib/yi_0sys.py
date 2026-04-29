@@ -124,7 +124,7 @@ def versionstr( module="IPython" ):
         try:
             mod = importlib.import_module(module)
             return getattr(mod, '__version__', None)
-        except ImportError:
+        except Exception:
             return None
 
 

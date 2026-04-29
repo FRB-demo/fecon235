@@ -242,22 +242,26 @@ def normalize( dfy ):
      return centered / float( dfy.std().tolist()[0] )
 
 
-def correlate( dfy, dfx, method='pearson' ):
+def correlate( dfy, dfx, method='pearson', **kwargs ):
      '''CORRELATION FUNCTION between series using pandas method.'''
      #  N.B. -  must specify column(s) within dataframe(s) !
      #              Types of correlations:
      #  'pearson'   Standard correlation coefficient
      #  'kendall' 	Kendall Tau correlation coefficient
      #  'spearman' 	Spearman rank correlation coefficient
+     if 'type' in kwargs:
+          method = kwargs['type']
      return dfy.corr( dfx, method=method )
 
 
-def cormatrix( dataframe, method='pearson' ):
+def cormatrix( dataframe, method='pearson', **kwargs ):
      '''PAIRWISE CORRELATIONS within a dataframe using pandas method.'''
      #              Types of correlations:
      #  'pearson'   Standard correlation coefficient
      #  'kendall' 	Kendall Tau correlation coefficient
      #  'spearman' 	Spearman rank correlation coefficient
+     if 'type' in kwargs:
+          method = kwargs['type']
      return dataframe.corr( method=method )
 
 
