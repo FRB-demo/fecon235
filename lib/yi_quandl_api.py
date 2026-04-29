@@ -313,7 +313,10 @@ def _getauthtoken(token, text):
                 print("Token activated and saved for later use.")
         except (IOError, OSError) as e:
             print("Error writing token to cache: {}".format(str(e)))
-    elif not savedtoken and not token:
+    env_token = os.environ.get('QUANDL_API_KEY', '')
+    if env_token:
+        return env_token
+    if not savedtoken and not token:
         if text and text != "no":
             print("No authentication tokens found: usage will be limited.")
             print("Set QUANDL_API_KEY env var or see www.quandl.com/api.")
@@ -321,9 +324,6 @@ def _getauthtoken(token, text):
         token = savedtoken
         if text and text != "no":
             print("Using cached token for authentication.")
-    env_token = os.environ.get('QUANDL_API_KEY', '')
-    if env_token:
-        return env_token
     return token
 
 
