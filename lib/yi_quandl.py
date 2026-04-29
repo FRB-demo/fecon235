@@ -29,9 +29,9 @@ like this:
      mydata = qdlapi.get("NSE/OIL", authtoken="your token here")
 
 It will then be stored in your working directory for continued use.
-Authtokens are saved as pickled files in the local directory as "authtoken.p"
-so it is unnecessary to enter them more than once, unless you change your
-working directory. 
+Authtokens are saved as JSON in ~/.quandl_token.json
+so it is unnecessary to enter them more than once.
+Alternatively, set the QUANDL_API_KEY environment variable.
 
 After creating an account at quandl.com, set your authentication token with
 the [Deprecated: Quandl.auth() function] setQuandlToken function below.
@@ -281,14 +281,12 @@ quandl = qdlapi.get
 
 
 def setQuandlToken( API_key ):
-     '''Generate authtoken.p in the local directory for API access.'''
+     '''Save API token to ~/.quandl_token.json for API access.'''
      #  Must have API key which is free by creating a Quandl account, 
      #  however, this is not necessary for very limited usage.
      dummy = qdlapi.get("NSE/OIL", authtoken=API_key, rows=1)
      #  The first request is all that matters for getting initiated.
-     print(' ::  Generated authtoken.p in local directory for API access.')
-     #
-     #  For security, authtoken.p shall not be committed via .gitignore
+     print(' ::  Saved token to ~/.quandl_token.json for API access.')
 
 
 def cotr_get( futures='GC', type='FO' ):
