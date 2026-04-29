@@ -563,11 +563,8 @@ def diflog( data, lags=1 ):
 def writefile( dataframe, filename='tmp-yi_1tools.csv', separator=',' ):
     '''Write dataframe to disk file using UTF-8 encoding.'''
     #  For tab delimited, use '\t' as separator.
-    try:
-        dataframe.to_csv( filename, sep=separator, encoding='utf-8' )
-        print(' ::  Dataframe written to file: ' + filename)
-    except (IOError, OSError) as e:
-        print(' !!  Error writing file {}: {}'.format(filename, e))
+    dataframe.to_csv( filename, sep=separator, encoding='utf-8' )
+    print(' ::  Dataframe written to file: ' + filename)
     return
 
 
