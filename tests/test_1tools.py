@@ -18,7 +18,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2016-04-18  First version tests lagdf().
 '''
 
-from __future__ import absolute_import, print_function
 
 import pandas as pd
 from fecon235.lib import yi_0sys as system

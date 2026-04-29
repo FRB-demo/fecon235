@@ -17,7 +17,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2017-07-09  First version based on notebook nb/prtf-boltzmann-1.ipynb
 '''
 
-from __future__ import absolute_import, print_function, division
 import numpy as np
 
 from fecon235 import fecon235 as fe

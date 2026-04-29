@@ -202,8 +202,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-08-03  First version patterned after yi_fred.py
 '''
 
-from __future__ import absolute_import, print_function
-
 import pandas as pd
 
 from . import yi_quandl_api as qdlapi    #  a.k.a. Quandl.py module

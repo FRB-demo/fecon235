@@ -79,7 +79,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2017-06-26  First version.
 '''
 
-from __future__ import absolute_import, print_function, division
 import numpy as np
 import fecon235.fecon235
 #      ^SOLE circular import style which works for Python 2 & 3.

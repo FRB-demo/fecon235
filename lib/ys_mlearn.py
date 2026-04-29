@@ -17,8 +17,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2017-06-06  First fecon235 version.
 '''
 
-from __future__ import absolute_import, print_function, division
-
 import numpy as np
 from operator import itemgetter
 from . import yi_1tools as tools

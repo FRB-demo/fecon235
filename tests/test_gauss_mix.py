@@ -22,7 +22,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2017-05-19  First version.
 '''
 
-from __future__ import absolute_import, print_function
 
 from fecon235.lib import yi_0sys as system
 from fecon235.lib import yi_fred as fred
@@ -102,7 +101,7 @@ def test_ys_gauss_mix_fecon235_check_gm2_strategy_infeasible():
         #  INTENTIONAL FAIL: That b is too low for high kurtosis.
         #  Previous test shows feasible when kurtosis=7.
         #  sympy actually fails correctly, and will raise its exception.
-    except:
+    except (ValueError, RuntimeError, Exception):
         a_feasible = "Intentionally_FATAL_since_INFEASIBLE"
         #             Avoids reproducing the traceback to assert next:
     assert a_feasible == "Intentionally_FATAL_since_INFEASIBLE"

@@ -83,14 +83,7 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2014-07-24  First version converted from fred-plot.ipynb
 '''
 
-from __future__ import absolute_import, print_function
-
-try:
-    from urllib.request import urlopen
-    #    ^for python3 
-except ImportError:
-    from urllib2 import urlopen
-    #    ^for python2 
+from urllib.request import urlopen
 
 import numpy as np
 import pandas as pd
@@ -278,16 +271,11 @@ def readfile( filename, separator=',', compress=None ):
     #        when data is missing or mistyped, e.g.
     #             dataframe['Y'] = dataframe['Y'].astype(float)
     #        will fail if the data is not in perfect condition.
-    try:
-        dataframe['Y'] = pd.to_numeric(dataframe['Y'], errors='coerce')
-        #  'coerce' gives NaN if particular parsing is invalid.
-    except:
-        #  convert_objects deprecated, but courtesy for pd < 0.17:
-        dataframe['Y'] = dataframe['Y'].convert_objects(convert_numeric=True)
-        #                              ^non-convertibles become NaN
+    dataframe['Y'] = pd.to_numeric(dataframe['Y'], errors='coerce')
+    #  'coerce' gives NaN if particular parsing is invalid.
 
     #  FRED uses "." to indicate missing value.
-    dataframe['Y'] = dataframe['Y'].fillna(method='pad')
+    dataframe['Y'] = dataframe['Y'].ffill()
     #                              ^NaN replaced by fill forward, 
     #                               common practice in time series analysis.
     return dataframe
@@ -299,7 +287,7 @@ def readfile( filename, separator=',', compress=None ):
 def makeURL( fredcode ):
     '''Create http address to access FRED's CSV files.'''
     #         Validated July 2014.
-    return 'http://research.stlouisfed.org/fred2/series/' \
+    return 'https://research.stlouisfed.org/fred2/series/' \
         + fredcode + '/downloaddata/' + fredcode + '.csv'
 
 
@@ -428,7 +416,7 @@ def getm4eurusd( fredcode=d4eurusd ):
           eurall = eurold.combine_first( eurnow )
           #               ^appends dataframe
           print(' ::  EURUSD synthetically goes back monthly to 1971.')
-     except:
+     except (IOError, OSError, FileNotFoundError):
           eurall = eurnow
           print(' ::  EURUSD monthly without synthetic 1971-2002 archive.')
      return eurall
@@ -445,7 +433,7 @@ def getspx( fredcode=d4spx ):
           spall = spold.combine_first( spnow )
           #             ^appends dataframe
           print(' ::  S&P 500 prepend successfully goes back to 1957.')
-     except:
+     except (IOError, OSError, FileNotFoundError):
           spall = spnow
           print(' ::  S&P 500 for last 10 years (1957-archive not found).')
      return spall
@@ -466,7 +454,7 @@ def gethomepx( fredcode=m4homepx ):
           hpall = hpold.combine_first( hpnow )
           #             ^appends dataframe
           print(' ::  Case-Shiller prepend successfully goes back to 1987.')
-     except:
+     except (IOError, OSError, FileNotFoundError):
           hpall = hpnow
           print(' ::  Case-Shiller since 2000 (1987-archive not found).')
      #  Case-Shiller is not dollar based, so we use:

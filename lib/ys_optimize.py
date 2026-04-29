@@ -63,8 +63,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2016-04-04  First fecon235 version.
 '''
 
-from __future__ import absolute_import, print_function, division
-
 import numpy as np                #  for numerical work.
 import scipy.optimize as sop      #  optimization routines.
 from . import yi_0sys as system

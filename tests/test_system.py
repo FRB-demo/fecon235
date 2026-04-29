@@ -15,7 +15,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2015-12-29  First edition for gitinfo(), Python and pandas versions.
 '''
 
-from __future__ import absolute_import, print_function
 
 from fecon235.lib import yi_0sys as system
 #

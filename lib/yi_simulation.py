@@ -22,7 +22,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2014-12-12  First version adapted from yi_fred.py
 '''
 
-from __future__ import absolute_import, print_function, division
 
 import numpy as np
 
@@ -75,16 +74,12 @@ def simug( sigma, N=256 ):
 def simug_mix( sigma1, sigma2, q=0.10, N=256 ):
     '''Simulate array from zero-mean Gaussian mixture GM(2).'''
     #     Mathematical details in nb/gauss-mix-kurtosis.ipynb
-    #  Pre-populate an array of shape (N,) with the FIRST Gaussian,
-    #  so that most work is done quickly and memory efficient...
     arr = simug( sigma1, N )
-    #     ... except for some random replacements:
-    for i in range(N):
-        #                p = 1-q = probability drawing from FIRST Gaussian.
-        #  So with probability q, replace an element of arr
-        #  with a float from the SECOND Gaussian:
-        if maybe( q ):
-            arr[i] = randog( sigma2 )
+    #  Vectorized: generate mask for positions drawn from second Gaussian
+    mask = np.random.random(N) < q
+    n_replacements = np.sum(mask)
+    if n_replacements > 0:
+        arr[mask] = sigma2 * np.random.randn(n_replacements)
     return arr
 
 
@@ -98,7 +93,7 @@ def GET_simu_spx_pcent():
      try:
           df = readfile( datafile, compress='gzip' )
           #  print(' ::  Import success: ' + datafile)
-     except:
+     except (IOError, OSError, FileNotFoundError):
           df = 0
           print(' !!  Failed to find: ' + datafile)
      return df

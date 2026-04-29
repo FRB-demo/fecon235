@@ -61,7 +61,6 @@ CHANGE LOG  For latest version, see https://github.com/rsvp/fecon235
 2014-08-01  First version split from yi_fred.py
 '''
 
-from __future__ import absolute_import, print_function, division
 
 import numpy as np                #  for numerical work.
 import matplotlib.pyplot as plt   #  for standard plots.
@@ -190,8 +189,8 @@ def georet( dfx, yearly=256 ):
      dfpc = dfx.pct_change( periods=1 )
      #          ^instead of first difference of logged data,
      #           gives slightly higher arithmetic means.
-     mean = dfpc.mean().values.tolist()[0] * yearly
-     vari = dfpc.var().values.tolist()[0]  * yearly
+     mean = dfpc.mean().iloc[0] * yearly
+     vari = dfpc.var().iloc[0]  * yearly
      #          ^summary statistics methods, see
      #           McKinney, p.139, Table 5-10.
      geor = mean - (0.5*vari)
@@ -243,23 +242,23 @@ def normalize( dfy ):
      return centered / float( dfy.std().tolist()[0] )
 
 
-def correlate( dfy, dfx, type='pearson' ):
+def correlate( dfy, dfx, method='pearson' ):
      '''CORRELATION FUNCTION between series using pandas method.'''
      #  N.B. -  must specify column(s) within dataframe(s) !
      #              Types of correlations:
      #  'pearson'   Standard correlation coefficient
      #  'kendall' 	Kendall Tau correlation coefficient
      #  'spearman' 	Spearman rank correlation coefficient
-     return dfy.corr( dfx, method=type )
+     return dfy.corr( dfx, method=method )
 
 
-def cormatrix( dataframe, type='pearson' ):
+def cormatrix( dataframe, method='pearson' ):
      '''PAIRWISE CORRELATIONS within a dataframe using pandas method.'''
      #              Types of correlations:
      #  'pearson'   Standard correlation coefficient
      #  'kendall' 	Kendall Tau correlation coefficient
      #  'spearman' 	Spearman rank correlation coefficient
-     return dataframe.corr( method=type )
+     return dataframe.corr( method=method )
 
 
 
@@ -564,8 +563,11 @@ def diflog( data, lags=1 ):
 def writefile( dataframe, filename='tmp-yi_1tools.csv', separator=',' ):
     '''Write dataframe to disk file using UTF-8 encoding.'''
     #  For tab delimited, use '\t' as separator.
-    dataframe.to_csv( filename, sep=separator, encoding='utf-8' )
-    print(' ::  Dataframe written to file: ' + filename)
+    try:
+        dataframe.to_csv( filename, sep=separator, encoding='utf-8' )
+        print(' ::  Dataframe written to file: ' + filename)
+    except (IOError, OSError) as e:
+        print(' !!  Error writing file {}: {}'.format(filename, e))
     return
 
 
